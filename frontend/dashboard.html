@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - SubService</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-content">
+          <h1>SubService</h1>
+          <div class="user-menu">
+            <span id="userName">Welcome</span>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="dashboard-main">
+        <!-- Subscription Status Card -->
+        <div class="status-card" id="subscriptionStatus">
+          <h2>Your Subscription</h2>
+          <div id="subscriptionContent">
+            <p>No active subscription</p>
+            <button class="btn btn-primary" onclick="showPlans()">
+              Subscribe Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Available Plans -->
+        <div class="plans-section" id="plansSection">
+          <h2>Available Plans</h2>
+          <div class="plans-grid" id="plansGrid">
+            <!-- Plans will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Subscription Management -->
+        <div class="management-section hidden" id="managementSection">
+          <h2>Manage Subscription</h2>
+          <div class="management-actions">
+            <button class="btn btn-warning" onclick="showUpgradePlans()">
+              Upgrade Plan
+            </button>
+            <button class="btn btn-danger" onclick="cancelSubscription()">
+              Cancel Subscription
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal for Plan Selection -->
+    <div id="planModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Select Plan</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalPlans">
+          <!-- Plans for selection will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
