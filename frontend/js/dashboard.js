@@ -41,13 +41,16 @@ function checkAdminAccess() {
     const headerContent = document.querySelector(".header-content");
     const userMenu = headerContent.querySelector(".user-menu");
 
-    const adminLink = document.createElement("a");
-    adminLink.href = "/admin";
-    adminLink.className = "btn btn-warning";
-    adminLink.textContent = "Admin Panel";
-    adminLink.style.marginRight = "10px";
+    // Check if admin link already exists
+    if (!userMenu.querySelector(".admin-panel-link")) {
+      const adminLink = document.createElement("a");
+      adminLink.href = "/admin";
+      adminLink.className = "btn btn-warning admin-panel-link"; // Added unique class
+      adminLink.textContent = "Admin Panel";
+      adminLink.style.marginRight = "10px";
 
-    userMenu.insertBefore(adminLink, userMenu.firstChild);
+      userMenu.insertBefore(adminLink, userMenu.firstChild);
+    }
   }
 }
 
