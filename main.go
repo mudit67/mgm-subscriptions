@@ -21,23 +21,27 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
+	// Connect to MongoDB with retry logic
 	mongoDB, err := database.MongoDbInit(cfg.MongoURI, cfg.DatabaseName)
 	if err != nil {
-		log.Fatal("Failed to connect to MongoDB:", err)
+		log.Fatal("Failed to connect to MongoDB after retries:", err)
 	}
 	defer mongoDB.Close()
 
-	// Initialize managers (replacing services and repositories)
+	// Start background reconnection monitoring
+	go mongoDB.BackgroundReconnect(cfg.MongoURI, cfg.DatabaseName)
+
+	// Initialize managers
 	userManager := models.NewUserManager(mongoDB.Database, cfg.JWTSecret, cfg.JWTExpiry)
 	planManager := models.NewPlanManager(mongoDB.Database)
 	subscriptionManager := models.NewSubscriptionManager(mongoDB.Database, planManager)
 
-	// Initialize controllers with managers
+	// Initialize controllers
 	userController := controllers.NewUserController(userManager)
 	planController := controllers.NewPlanController(planManager)
 	subscriptionController := controllers.NewSubscriptionController(subscriptionManager)
 
-	// Rest of your main.go remains the same...
+	// Setup router
 	if os.Getenv("GIN_MODE") == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -57,13 +61,27 @@ func main() {
 		c.Next()
 	})
 
-	// Static files and routes
+	// Static files
 	router.Static("/css", "./frontend/css")
 	router.Static("/js", "./frontend/js")
-	router.Static("/assets", "./frontend/assets")
 	router.GET("/", func(c *gin.Context) { c.File("./frontend/index.html") })
 	router.GET("/dashboard", func(c *gin.Context) { c.File("./frontend/dashboard.html") })
 	router.GET("/admin", func(c *gin.Context) { c.File("./frontend/admin.html") })
+
+	// Health check with database ping
+	router.GET("/health", func(c *gin.Context) {
+		if err := mongoDB.Ping(); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status": "unhealthy",
+				"error":  "database connection failed",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status":    "healthy",
+			"timestamp": time.Now(),
+		})
+	})
 
 	// API routes
 	api := router.Group("/api")
