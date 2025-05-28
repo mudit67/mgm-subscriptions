@@ -22,7 +22,7 @@ func NewSubscriptionController(subscriptionService *services.SubscriptionService
 	}
 }
 
-func (c *SubscriptionController) CreateSubscription(ctx *gin.Context) {
+func (c *SubscriptionController) UpsertSubscription(ctx *gin.Context) {
 	var req models.CreateSubscriptionRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		utils.ValidationErrorResponse(ctx, err)
@@ -34,13 +34,13 @@ func (c *SubscriptionController) CreateSubscription(ctx *gin.Context) {
 		return
 	}
 
-	subscription, err := c.subscriptionService.CreateSubscription(ctx.Request.Context(), &req)
+	subscription, err := c.subscriptionService.UpsertSubscription(ctx.Request.Context(), &req)
 	if err != nil {
-		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to create subscription", err)
+		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to process subscription", err)
 		return
 	}
 
-	utils.SuccessResponse(ctx, http.StatusCreated, "Subscription created successfully", subscription)
+	utils.SuccessResponse(ctx, http.StatusOK, "Subscription processed successfully", subscription)
 }
 
 func (c *SubscriptionController) GetSubscription(ctx *gin.Context) {
@@ -57,49 +57,6 @@ func (c *SubscriptionController) GetSubscription(ctx *gin.Context) {
 	}
 
 	utils.SuccessResponse(ctx, http.StatusOK, "Subscription retrieved successfully", subscription)
-}
-
-func (c *SubscriptionController) RenewSubscription(ctx *gin.Context) {
-	userID := ctx.Param("userId")
-	if userID == "" {
-		utils.ErrorResponse(ctx, http.StatusBadRequest, "User ID is required", nil)
-		return
-	}
-
-	subscription, err := c.subscriptionService.RenewSubscription(ctx.Request.Context(), userID)
-	if err != nil {
-		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to renew subscription", err)
-		return
-	}
-
-	utils.SuccessResponse(ctx, http.StatusOK, "Subscription renewed successfully", subscription)
-}
-
-func (c *SubscriptionController) UpdateSubscription(ctx *gin.Context) {
-	userID := ctx.Param("userId")
-	if userID == "" {
-		utils.ErrorResponse(ctx, http.StatusBadRequest, "User ID is required", nil)
-		return
-	}
-
-	var req models.UpdateSubscriptionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		utils.ValidationErrorResponse(ctx, err)
-		return
-	}
-
-	if err := c.validator.Struct(&req); err != nil {
-		utils.ValidationErrorResponse(ctx, err)
-		return
-	}
-
-	subscription, err := c.subscriptionService.UpdateSubscription(ctx.Request.Context(), userID, &req)
-	if err != nil {
-		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to update subscription", err)
-		return
-	}
-
-	utils.SuccessResponse(ctx, http.StatusOK, "Subscription updated successfully", subscription)
 }
 
 func (c *SubscriptionController) CancelSubscription(ctx *gin.Context) {

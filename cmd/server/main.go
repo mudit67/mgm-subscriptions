@@ -116,12 +116,18 @@ func main() {
 		protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 		{
 			// Subscription routes
-			protected.POST("/subscriptions", subscriptionController.CreateSubscription)
-			protected.GET("/subscriptions/:userId", subscriptionController.GetSubscription)
-			protected.PUT("/subscriptions/:userId", subscriptionController.UpdateSubscription)
-			protected.DELETE("/subscriptions/:userId", subscriptionController.CancelSubscription)
-			protected.POST("/subscriptions/:userId/renew", subscriptionController.RenewSubscription)
+			// protected.POST("/subscriptions", subscriptionController.CreateSubscription)
+			// protected.GET("/subscriptions/:userId", subscriptionController.GetSubscription)
+			// protected.PUT("/subscriptions/:userId", subscriptionController.UpdateSubscription)
+			// protected.DELETE("/subscriptions/:userId", subscriptionController.CancelSubscription)
+			// protected.POST("/subscriptions/:userId/renew", subscriptionController.RenewSubscription)
 
+			protected.POST("/subscriptions", subscriptionController.UpsertSubscription)
+			protected.PUT("/subscriptions", subscriptionController.UpsertSubscription) // Same handler for PUT
+
+			// Keep existing endpoints
+			protected.GET("/subscriptions/:userId", subscriptionController.GetSubscription)
+			protected.DELETE("/subscriptions/:userId", subscriptionController.CancelSubscription)
 			adminOnly := protected.Group("/")
 			adminOnly.Use(middleware.AdminMiddleware())
 			{

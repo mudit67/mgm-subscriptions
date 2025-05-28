@@ -71,28 +71,14 @@ class API {
   }
 
   // Subscription endpoints
-  static async createSubscription(userId, planId) {
+  static async upsertSubscription(userId, planId) {
     return this.request("/subscriptions", {
       method: "POST",
       body: JSON.stringify({ user_id: userId, plan_id: planId }),
     });
   }
-
   static async getSubscription(userId) {
     return this.request(`/subscriptions/${userId}`);
-  }
-
-  static async renewSubscription(userId) {
-    return this.request(`/subscriptions/${userId}/renew`, {
-      method: "POST",
-    });
-  }
-
-  static async updateSubscription(userId, planId) {
-    return this.request(`/subscriptions/${userId}`, {
-      method: "PUT",
-      body: JSON.stringify({ plan_id: planId }),
-    });
   }
 
   static async cancelSubscription(userId) {
