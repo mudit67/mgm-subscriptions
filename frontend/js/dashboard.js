@@ -36,6 +36,21 @@ async function loadDashboard() {
   }
 }
 
+function checkAdminAccess() {
+  if (currentUser?.username === "admin") {
+    const headerContent = document.querySelector(".header-content");
+    const userMenu = headerContent.querySelector(".user-menu");
+
+    const adminLink = document.createElement("a");
+    adminLink.href = "/admin";
+    adminLink.className = "btn btn-warning";
+    adminLink.textContent = "Admin Panel";
+    adminLink.style.marginRight = "10px";
+
+    userMenu.insertBefore(adminLink, userMenu.firstChild);
+  }
+}
+
 // Data loading functions
 async function loadPlans() {
   const response = await API.getPlans();
