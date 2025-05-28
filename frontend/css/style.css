@@ -517,3 +517,201 @@ body {
     min-width: 80px;
   }
 }
+
+/* Enhanced Subscription Card */
+.subscription-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.subscription-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: rotate(45deg);
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.subscription-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.subscription-status {
+  position: relative;
+  z-index: 2;
+}
+
+.status-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: rgba(40, 167, 69, 0.9);
+  color: white;
+}
+
+.status-cancelled {
+  background: rgba(255, 193, 7, 0.9);
+  color: #212529;
+}
+
+.status-expired {
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+}
+
+.status-inactive {
+  background: rgba(108, 117, 125, 0.9);
+  color: white;
+}
+
+.subscription-content {
+  position: relative;
+  z-index: 2;
+}
+
+.subscription-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.detail-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 1.8rem;
+  color: #ffd700;
+}
+
+.subscription-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.no-subscription {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-subscription h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  opacity: 0.9;
+}
+
+.no-subscription p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-bottom: 25px;
+}
+
+/* Button Styles for Subscription Card */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger-glass {
+  background: rgba(220, 53, 69, 0.3);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  color: white;
+}
+
+.btn-danger-glass:hover {
+  background: rgba(220, 53, 69, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-success-glass {
+  background: rgba(40, 167, 69, 0.3);
+  border: 1px solid rgba(40, 167, 69, 0.5);
+  color: white;
+}
+
+.btn-success-glass:hover {
+  background: rgba(40, 167, 69, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .subscription-card {
+    padding: 30px 20px;
+  }
+
+  .subscription-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .subscription-details {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .subscription-actions {
+    justify-content: center;
+  }
+
+  .detail-item {
+    text-align: center;
+  }
+}

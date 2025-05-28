@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - SubService</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
     <div class="dashboard">
@@ -21,14 +21,17 @@
 
       <!-- Main Content -->
       <main class="dashboard-main">
-        <!-- Subscription Status Card -->
-        <div class="status-card" id="subscriptionStatus">
-          <h2>Your Subscription</h2>
-          <div id="subscriptionContent">
-            <p>No active subscription</p>
-            <button class="btn btn-primary" onclick="showPlans()">
-              Subscribe Now
-            </button>
+        <!-- Enhanced Subscription Status Card -->
+        <div class="subscription-card" id="subscriptionCard">
+          <div class="subscription-header">
+            <h2>Your Subscription</h2>
+            <div class="subscription-status" id="subscriptionStatusBadge">
+              <!-- Status badge will be inserted here -->
+            </div>
+          </div>
+
+          <div class="subscription-content" id="subscriptionContent">
+            <!-- Subscription details will be loaded here -->
           </div>
         </div>
 
@@ -37,19 +40,6 @@
           <h2>Available Plans</h2>
           <div class="plans-grid" id="plansGrid">
             <!-- Plans will be loaded here -->
-          </div>
-        </div>
-
-        <!-- Subscription Management -->
-        <div class="management-section hidden" id="managementSection">
-          <h2>Manage Subscription</h2>
-          <div class="management-actions">
-            <button class="btn btn-warning" onclick="showUpgradePlans()">
-              Upgrade Plan
-            </button>
-            <button class="btn btn-danger" onclick="cancelSubscription()">
-              Cancel Subscription
-            </button>
           </div>
         </div>
       </main>
@@ -68,7 +58,7 @@
       </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
   </body>
 </html>

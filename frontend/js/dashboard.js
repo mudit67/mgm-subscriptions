@@ -1,23 +1,29 @@
+// Global state
 let currentUser = null;
 let currentSubscription = null;
 let availablePlans = [];
 
+// Initialization
 document.addEventListener("DOMContentLoaded", function () {
+  if (!authenticateUser()) return;
+  loadDashboard();
+});
+
+function authenticateUser() {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
 
   if (!token || !user) {
     window.location.href = "/";
-    return;
+    return false;
   }
 
   currentUser = JSON.parse(user);
   document.getElementById(
     "userName"
   ).textContent = `Welcome, ${currentUser.name}`;
-
-  loadDashboard();
-});
+  return true;
+}
 
 async function loadDashboard() {
   try {
@@ -29,288 +35,106 @@ async function loadDashboard() {
   }
 }
 
+// Data loading functions
 async function loadPlans() {
-  try {
-    const response = await API.getPlans();
-    if (response.success) {
-      availablePlans = response.data;
-      renderPlans();
-    }
-  } catch (error) {
-    console.error("Error loading plans:", error);
+  const response = await API.getPlans();
+  if (response.success) {
+    availablePlans = response.data;
+    renderPlans();
   }
 }
 
 async function loadUserSubscription() {
   try {
     const response = await API.getSubscription(currentUser.id);
-    if (response.success) {
-      currentSubscription = response.data;
-      renderSubscriptionStatus();
-    }
+    currentSubscription = response.success ? response.data : null;
   } catch (error) {
     currentSubscription = null;
-    renderSubscriptionStatus();
   }
+  renderSubscriptionCard();
 }
 
-// function renderPlans() {
-//   const plansGrid = document.getElementById("plansGrid");
-//   plansGrid.innerHTML = "";
-
-//   availablePlans.forEach((plan) => {
-//     const planCard = document.createElement("div");
-//     planCard.className = "plan-card";
-
-//     const isCurrentPlan =
-//       currentSubscription &&
-//       currentSubscription.plan_id === plan.id &&
-//       currentSubscription.status === "ACTIVE";
-
-//     const canSubscribe =
-//       !currentSubscription || currentSubscription.status !== "ACTIVE";
-
-//     planCard.innerHTML = `
-//             <div class="plan-name">${plan.name}</div>
-//             <div class="plan-price">
-//                 <span class="currency">₹</span>${plan.price}
-//                 <span class="period">/${plan.duration}</span>
-//             </div>
-//             <ul class="plan-features">
-//                 ${plan.features
-//                   .map((feature) => `<li>${feature}</li>`)
-//                   .join("")}
-//             </ul>
-//             <button class="btn ${
-//               isCurrentPlan ? "btn-secondary" : "btn-primary"
-//             }"
-//                     onclick="subscribeToPlan('${plan.id}')"
-//                     ${isCurrentPlan ? "disabled" : ""}>
-//                 ${
-//                   isCurrentPlan
-//                     ? "Current Plan"
-//                     : canSubscribe
-//                     ? "Subscribe"
-//                     : "Upgrade/Change Plan"
-//                 }
-//             </button>
-//         `;
-
-//     plansGrid.appendChild(planCard);
-//   });
-// }
-
-function renderSubscriptionStatus() {
+// Rendering functions
+function renderSubscriptionCard() {
   const subscriptionContent = document.getElementById("subscriptionContent");
-  const managementSection = document.getElementById("managementSection");
+  const statusBadge = document.getElementById("subscriptionStatusBadge");
 
-  if (currentSubscription) {
-    const plan = availablePlans.find(
-      (p) => p.id === currentSubscription.plan_id
-    );
-    const expiryDate = new Date(
-      currentSubscription.expires_at
-    ).toLocaleDateString();
-
-    let statusColor = "#28a745"; // Green for active
-    if (currentSubscription.status === "EXPIRED") statusColor = "#dc3545"; // Red
-    if (currentSubscription.status === "CANCELLED") statusColor = "#ffc107"; // Yellow
-    if (currentSubscription.status === "INACTIVE") statusColor = "#6c757d"; // Gray
-
+  if (!currentSubscription) {
+    statusBadge.innerHTML = "";
     subscriptionContent.innerHTML = `
-            <div class="subscription-info">
-                <h3>${plan ? plan.name : "Unknown Plan"}</h3>
-                <p>Status: <span style="color: ${statusColor}; font-weight: 600;">${
-      currentSubscription.status
-    }</span></p>
-                <p>Expires: ${expiryDate}</p>
-                <p>Price: ₹${plan ? plan.price : "N/A"}/${
-      plan ? plan.duration : "N/A"
-    }</p>
-            </div>
-        `;
-
-    // Show management section for all subscription statuses except EXPIRED
-    if (currentSubscription.status !== "EXPIRED") {
-      managementSection.classList.remove("hidden");
-      updateManagementButtons();
-    } else {
-      managementSection.classList.add("hidden");
-    }
-  } else {
-    subscriptionContent.innerHTML = `
-            <p>No active subscription</p>
-            <button class="btn btn-primary" onclick="showPlans()">Subscribe Now</button>
-        `;
-    managementSection.classList.add("hidden");
-  }
-}
-
-// function updateManagementButtons() {
-//   const managementActions = document.querySelector(".management-actions");
-
-//   if (currentSubscription.status === "ACTIVE") {
-//     managementActions.innerHTML = `
-//             <button class="btn btn-warning" onclick="showUpgradePlans()">Change Plan</button>
-//             <button class="btn btn-danger" onclick="cancelSubscription()">Cancel Subscription</button>
-//         `;
-//   } else if (currentSubscription.status === "CANCELLED") {
-//     managementActions.innerHTML = `
-//             <button class="btn btn-success" onclick="renewSubscription()">Renew Subscription</button>
-//             <button class="btn btn-warning" onclick="showUpgradePlans()">Change Plan</button>
-//         `;
-//   } else {
-//     managementActions.innerHTML = `
-//             <button class="btn btn-primary" onclick="showUpgradePlans()">Subscribe to New Plan</button>
-//         `;
-//   }
-// }
-
-// New function for renewing cancelled subscriptions
-// async function renewSubscription() {
-//   if (!confirm("Are you sure you want to renew your subscription?")) {
-//     return;
-//   }
-
-//   try {
-//     const response = await API.renewSubscription(currentUser.id);
-//     if (response.success) {
-//       alert("Subscription renewed successfully!");
-//       await loadUserSubscription();
-//     }
-//   } catch (error) {
-//     alert("Error renewing subscription: " + error.message);
-//   }
-// }
-
-// async function subscribeToPlan(planId) {
-//   // Allow subscription if no current subscription or if current subscription is not active
-//   if (currentSubscription && currentSubscription.status === "ACTIVE") {
-//     alert(
-//       "You already have an active subscription. Please cancel it first or use the Change Plan option."
-//     );
-//     return;
-//   }
-
-//   try {
-//     const response = await API.createSubscription(currentUser.id, planId);
-//     if (response.success) {
-//       alert("Subscription created successfully!");
-//       await loadUserSubscription();
-//     }
-//   } catch (error) {
-//     alert("Error creating subscription: " + error.message);
-//   }
-// }
-
-async function cancelSubscription() {
-  if (!confirm("Are you sure you want to cancel your subscription?")) {
+            <div class="no-subscription">
+                <h3>No Active Subscription</h3>
+                <p>Choose from our amazing plans to get started with SubService</p>
+                <button class="btn btn-glass" onclick="showPlans()">Browse Plans</button>
+            </div>`;
     return;
   }
 
-  try {
-    const response = await API.cancelSubscription(currentUser.id);
-    if (response.success) {
-      alert("Subscription cancelled successfully!");
-      await loadUserSubscription();
-    }
-  } catch (error) {
-    alert("Error cancelling subscription: " + error.message);
+  const plan = availablePlans.find((p) => p.id === currentSubscription.plan_id);
+  const formatDate = (date) => new Date(date).toLocaleDateString("en-IN");
+
+  statusBadge.innerHTML = `
+        <span class="status-badge status-${currentSubscription.status.toLowerCase()}">
+            ${currentSubscription.status}
+        </span>`;
+
+  subscriptionContent.innerHTML = `
+        <div class="subscription-details">
+            <div class="detail-item">
+                <div class="detail-label">Plan Name</div>
+                <div class="detail-value">${plan?.name || "Unknown Plan"}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Price</div>
+                <div class="detail-value price-value">₹${
+                  plan?.price || "N/A"
+                }</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Duration</div>
+                <div class="detail-value">${plan?.duration || "N/A"}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Started On</div>
+                <div class="detail-value">${formatDate(
+                  currentSubscription.start_date
+                )}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Expires On</div>
+                <div class="detail-value">${formatDate(
+                  currentSubscription.expires_at
+                )}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Features</div>
+                <div class="detail-value">${
+                  plan?.features.length || 0
+                } features included</div>
+            </div>
+        </div>
+        ${renderSubscriptionActions()}`;
+}
+
+function renderSubscriptionActions() {
+  if (!currentSubscription) return "";
+
+  const plan = availablePlans.find((p) => p.id === currentSubscription.plan_id);
+  const planName = plan?.name || "Current Plan";
+
+  if (currentSubscription.status === "ACTIVE") {
+    return `
+            <div class="subscription-actions">
+                <button class="btn btn-glass" onclick="showUpgradePlans()">Change Plan</button>
+                <button class="btn btn-danger-glass" onclick="cancelSubscription()">Cancel Subscription</button>
+            </div>`;
   }
-}
 
-function showPlans() {
-  document
-    .getElementById("plansSection")
-    .scrollIntoView({ behavior: "smooth" });
-}
-
-function showUpgradePlans() {
-  const modal = document.getElementById("planModal");
-  const modalPlans = document.getElementById("modalPlans");
-
-  modalPlans.innerHTML = "";
-  availablePlans.forEach((plan) => {
-    if (currentSubscription && plan.id === currentSubscription.plan_id) {
-      return; // Skip current plan
-    }
-
-    const planDiv = document.createElement("div");
-    planDiv.className = "plan-card";
-    planDiv.innerHTML = `
-            <div class="plan-name">${plan.name}</div>
-            <div class="plan-price">₹${plan.price}/${plan.duration}</div>
-            <ul class="plan-features">
-                ${plan.features
-                  .map((feature) => `<li>${feature}</li>`)
-                  .join("")}
-            </ul>
-            <button class="btn btn-primary" onclick="upgradeToPlan('${
-              plan.id
-            }')">
-                ${
-                  currentSubscription && currentSubscription.status === "ACTIVE"
-                    ? "Change to This Plan"
-                    : "Subscribe"
-                }
-            </button>
-        `;
-    modalPlans.appendChild(planDiv);
-  });
-
-  modal.classList.remove("hidden");
-}
-
-function showReactivationPlans() {
-  showUpgradePlans(); // Same as upgrade, but for cancelled subscriptions
-}
-
-// async function upgradeToPlan(planId) {
-//   try {
-//     let response;
-
-//     if (currentSubscription && currentSubscription.status === "ACTIVE") {
-//       // Update existing subscription
-//       response = await API.updateSubscription(currentUser.id, planId);
-//     } else {
-//       // Create new subscription (for cancelled/expired subscriptions)
-//       response = await API.createSubscription(currentUser.id, planId);
-//     }
-
-//     if (response.success) {
-//       alert("Subscription updated successfully!");
-//       closeModal();
-//       await loadUserSubscription();
-//     }
-//   } catch (error) {
-//     alert("Error updating subscription: " + error.message);
-//   }
-// }
-
-function closeModal() {
-  document.getElementById("planModal").classList.add("hidden");
-}
-
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  window.location.href = "/";
-}
-
-// Add this function to dashboard.js
-function checkAdminAccess() {
-  if (currentUser && currentUser.username === "admin") {
-    // Add admin link to dashboard
-    const headerContent = document.querySelector(".header-content");
-    const adminLink = document.createElement("a");
-    adminLink.href = "/admin";
-    adminLink.className = "btn btn-warning";
-    adminLink.textContent = "Admin Panel";
-    adminLink.style.marginRight = "10px";
-
-    const userMenu = headerContent.querySelector(".user-menu");
-    userMenu.insertBefore(adminLink, userMenu.firstChild);
-  }
+  return `
+        <div class="subscription-actions">
+            <button class="btn btn-glass" onclick="showUpgradePlans()">Change Plan</button>
+            <button class="btn btn-success-glass" onclick="renewCurrentPlan()">Subscribe Again (${planName})</button>
+        </div>`;
 }
 
 function renderPlans() {
@@ -318,39 +142,29 @@ function renderPlans() {
   plansGrid.innerHTML = "";
 
   availablePlans.forEach((plan) => {
-    const planCard = document.createElement("div");
-    planCard.className = "plan-card";
-
-    const isCurrentPlan =
-      currentSubscription &&
-      currentSubscription.plan_id === plan.id &&
-      currentSubscription.status === "ACTIVE";
+    const isCurrentActivePlan =
+      currentSubscription?.plan_id === plan.id &&
+      currentSubscription?.status === "ACTIVE";
 
     let buttonText = "Subscribe";
     let buttonClass = "btn-primary";
     let isDisabled = false;
 
     if (currentSubscription) {
-      switch (currentSubscription.status) {
-        case "ACTIVE":
-          if (isCurrentPlan) {
-            buttonText = "Current Plan";
-            buttonClass = "btn-secondary";
-            isDisabled = true;
-          } else {
-            buttonText = "Change Plan";
-            buttonClass = "btn-warning";
-          }
-          break;
-        case "CANCELLED":
-        case "EXPIRED":
-        case "INACTIVE":
-          buttonText = isCurrentPlan ? "Renew Plan" : "Subscribe";
-          buttonClass = isCurrentPlan ? "btn-success" : "btn-primary";
-          break;
+      if (currentSubscription.status === "ACTIVE") {
+        if (isCurrentActivePlan) {
+          buttonText = "Current Plan";
+          buttonClass = "btn-secondary";
+          isDisabled = true;
+        } else {
+          buttonText = "Change Plan";
+          buttonClass = "btn-warning";
+        }
       }
     }
 
+    const planCard = document.createElement("div");
+    planCard.className = "plan-card";
     planCard.innerHTML = `
             <div class="plan-name">${plan.name}</div>
             <div class="plan-price">
@@ -366,54 +180,126 @@ function renderPlans() {
                     onclick="handleSubscriptionAction('${plan.id}')"
                     ${isDisabled ? "disabled" : ""}>
                 ${buttonText}
-            </button>
-        `;
+            </button>`;
 
     plansGrid.appendChild(planCard);
   });
 }
 
-// Merged subscription action handler
+// Action handlers
 async function handleSubscriptionAction(planId) {
-  try {
-    const response = await API.upsertSubscription(currentUser.id, planId);
-    if (response.success) {
-      alert("Subscription updated successfully!");
-      await loadUserSubscription();
-    }
-  } catch (error) {
-    alert("Error processing subscription: " + error.message);
-  }
+  await executeAction(
+    () => API.upsertSubscription(currentUser.id, planId),
+    "Subscription updated successfully!"
+  );
 }
 
-function updateManagementButtons() {
-  const managementActions = document.querySelector(".management-actions");
-
-  if (currentSubscription.status === "ACTIVE") {
-    managementActions.innerHTML = `
-            <button class="btn btn-warning" onclick="showUpgradePlans()">Change Plan</button>
-            <button class="btn btn-danger" onclick="cancelSubscription()">Cancel Subscription</button>
-        `;
-  } else {
-    managementActions.innerHTML = `
-            <button class="btn btn-primary" onclick="showUpgradePlans()">Subscribe to Plan</button>
-        `;
+async function renewCurrentPlan() {
+  if (!currentSubscription) {
+    alert("No subscription found to renew");
+    return;
   }
+
+  const plan = availablePlans.find((p) => p.id === currentSubscription.plan_id);
+  const planName = plan?.name || "your current plan";
+
+  if (!confirm(`Are you sure you want to renew ${planName}?`)) return;
+
+  await executeAction(
+    () => API.upsertSubscription(currentUser.id, currentSubscription.plan_id),
+    `${planName} renewed successfully!`
+  );
 }
 
-// Simplified modal handling
+async function cancelSubscription() {
+  if (!confirm("Are you sure you want to cancel your subscription?")) return;
+
+  await executeAction(
+    () => API.cancelSubscription(currentUser.id),
+    "Subscription cancelled successfully!"
+  );
+}
+
 async function upgradeToPlan(planId) {
+  await executeAction(
+    () => API.upsertSubscription(currentUser.id, planId),
+    "Subscription updated successfully!"
+  );
+  closeModal();
+}
+
+// Utility functions
+async function executeAction(apiCall, successMessage) {
   try {
-    const response = await API.upsertSubscription(currentUser.id, planId);
+    const response = await apiCall();
     if (response.success) {
-      alert("Subscription updated successfully!");
-      closeModal();
+      alert(successMessage);
       await loadUserSubscription();
     }
   } catch (error) {
-    alert("Error updating subscription: " + error.message);
+    alert("Error: " + error.message);
   }
 }
 
-// Remove the old subscribeToPlan, renewSubscription functions
-// Keep the existing cancelSubscription, showPlans, etc.
+function showPlans() {
+  document
+    .getElementById("plansSection")
+    .scrollIntoView({ behavior: "smooth" });
+}
+
+function showUpgradePlans() {
+  const modal = document.getElementById("planModal");
+  const modalPlans = document.getElementById("modalPlans");
+
+  modalPlans.innerHTML = "";
+  availablePlans
+    .filter(
+      (plan) =>
+        !(
+          currentSubscription?.plan_id === plan.id &&
+          currentSubscription?.status === "ACTIVE"
+        )
+    )
+    .forEach((plan) => {
+      const planDiv = document.createElement("div");
+      planDiv.className = "plan-card";
+      planDiv.innerHTML = `
+                <div class="plan-name">${plan.name}</div>
+                <div class="plan-price">₹${plan.price}/${plan.duration}</div>
+                <ul class="plan-features">
+                    ${plan.features
+                      .map((feature) => `<li>${feature}</li>`)
+                      .join("")}
+                </ul>
+                <button class="btn btn-primary" onclick="upgradeToPlan('${
+                  plan.id
+                }')">Select Plan</button>`;
+      modalPlans.appendChild(planDiv);
+    });
+
+  modal.classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("planModal").classList.add("hidden");
+}
+
+function checkAdminAccess() {
+  if (currentUser?.username === "admin") {
+    const headerContent = document.querySelector(".header-content");
+    const userMenu = headerContent.querySelector(".user-menu");
+
+    const adminLink = document.createElement("a");
+    adminLink.href = "/admin";
+    adminLink.className = "btn btn-warning";
+    adminLink.textContent = "Admin Panel";
+    adminLink.style.marginRight = "10px";
+
+    userMenu.insertBefore(adminLink, userMenu.firstChild);
+  }
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "/";
+}
