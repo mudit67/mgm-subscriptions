@@ -295,3 +295,30 @@ function logout() {
   localStorage.removeItem("user");
   window.location.href = "/";
 }
+
+// Add this function to dashboard.js
+function checkAdminAccess() {
+  if (currentUser && currentUser.username === "admin") {
+    // Add admin link to dashboard
+    const headerContent = document.querySelector(".header-content");
+    const adminLink = document.createElement("a");
+    adminLink.href = "/admin";
+    adminLink.className = "btn btn-warning";
+    adminLink.textContent = "Admin Panel";
+    adminLink.style.marginRight = "10px";
+
+    const userMenu = headerContent.querySelector(".user-menu");
+    userMenu.insertBefore(adminLink, userMenu.firstChild);
+  }
+}
+
+// Call this function in your loadDashboard function
+async function loadDashboard() {
+  try {
+    await loadPlans();
+    await loadUserSubscription();
+    checkAdminAccess(); // Add this line
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+  }
+}

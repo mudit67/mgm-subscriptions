@@ -83,6 +83,11 @@ func main() {
 	router.Static("/js", "./frontend/js")
 	router.Static("/assets", "./frontend/assets")
 
+	// Serve admin.html
+	router.GET("/admin", func(c *gin.Context) {
+		c.File("./frontend/admin.html")
+	})
+
 	// Serve index.html on root path
 	router.GET("/", func(c *gin.Context) {
 		c.File("./frontend/index.html")
@@ -117,10 +122,13 @@ func main() {
 			protected.DELETE("/subscriptions/:userId", subscriptionController.CancelSubscription)
 			protected.POST("/subscriptions/:userId/renew", subscriptionController.RenewSubscription)
 
-			// Admin plan routes
-			protected.POST("/plans", planController.CreatePlan)
-			protected.PUT("/plans/:id", planController.UpdatePlan)
-			protected.DELETE("/plans/:id", planController.DeletePlan)
+			adminOnly := protected.Group("/")
+			adminOnly.Use(middleware.AdminMiddleware())
+			{
+				adminOnly.POST("/plans", planController.CreatePlan)
+				adminOnly.PUT("/plans/:id", planController.UpdatePlan)
+				adminOnly.DELETE("/plans/:id", planController.DeletePlan)
+			}
 		}
 	}
 

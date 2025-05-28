@@ -68,11 +68,11 @@ func (s *UserService) Login(ctx context.Context, req *models.LoginRequest) (*mod
 	// Parse JWT expiry
 	expiry, err := time.ParseDuration(s.jwtExpiry)
 	if err != nil {
-		expiry = 24 * time.Hour // Default to 24 hours
+		expiry = 24 * time.Hour
 	}
 
-	// Generate JWT token
-	token, err := utils.GenerateJWT(user.ID.Hex(), s.jwtSecret, expiry)
+	// Generate JWT token with username included
+	token, err := utils.GenerateJWT(user.ID.Hex(), user.Username, s.jwtSecret, expiry)
 	if err != nil {
 		return nil, err
 	}

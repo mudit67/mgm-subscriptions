@@ -29,6 +29,20 @@ class API {
     }
   }
 
+  // Plan management endpoints
+  static async createPlan(planData) {
+    return this.request("/plans", {
+      method: "POST",
+      body: JSON.stringify(planData),
+    });
+  }
+
+  static async deletePlan(planId) {
+    return this.request(`/plans/${planId}`, {
+      method: "DELETE",
+    });
+  }
+
   // Auth endpoints
   static async login(username, password) {
     return this.request("/auth/login", {

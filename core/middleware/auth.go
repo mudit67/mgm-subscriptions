@@ -31,7 +31,9 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
+		// Set both user_id and username in context
 		c.Set("user_id", claims.UserID)
+		c.Set("username", claims.Username)
 		c.Next()
 	}
 }
