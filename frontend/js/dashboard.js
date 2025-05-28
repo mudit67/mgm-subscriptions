@@ -29,6 +29,7 @@ async function loadDashboard() {
   try {
     await loadUserSubscription();
     await loadPlans();
+    await renderSubscriptionCard();
     checkAdminAccess();
   } catch (error) {
     console.error("Error loading dashboard:", error);
@@ -58,18 +59,18 @@ async function loadUserSubscription() {
 function renderSubscriptionCard() {
   const subscriptionContent = document.getElementById("subscriptionContent");
   const statusBadge = document.getElementById("subscriptionStatusBadge");
-
   if (!currentSubscription) {
     statusBadge.innerHTML = "";
     subscriptionContent.innerHTML = `
-            <div class="no-subscription">
-                <h3>No Active Subscription</h3>
-                <p>Choose from our amazing plans to get started with SubService</p>
-                <button class="btn btn-glass" onclick="showPlans()">Browse Plans</button>
-            </div>`;
+    <div class="no-subscription">
+    <h3>No Active Subscription</h3>
+    <p>Choose from our amazing plans to get started with SubService</p>
+    <button class="btn btn-glass" onclick="showPlans()">Browse Plans</button>
+    </div>`;
     return;
   }
 
+  console.log(currentSubscription);
   const plan = availablePlans.find((p) => p.id === currentSubscription.plan_id);
   const formatDate = (date) => new Date(date).toLocaleDateString("en-IN");
 
@@ -125,14 +126,12 @@ function renderSubscriptionActions() {
   if (currentSubscription.status === "ACTIVE") {
     return `
             <div class="subscription-actions">
-                <button class="btn btn-glass" onclick="showUpgradePlans()">Change Plan</button>
                 <button class="btn btn-danger-glass" onclick="cancelSubscription()">Cancel Subscription</button>
             </div>`;
   }
 
   return `
         <div class="subscription-actions">
-            <button class="btn btn-glass" onclick="showUpgradePlans()">Change Plan</button>
             <button class="btn btn-success-glass" onclick="renewCurrentPlan()">Subscribe Again (${planName})</button>
         </div>`;
 }
@@ -225,7 +224,6 @@ async function upgradeToPlan(planId) {
     () => API.upsertSubscription(currentUser.id, planId),
     "Subscription updated successfully!"
   );
-  closeModal();
 }
 
 // Utility functions
@@ -245,58 +243,6 @@ function showPlans() {
   document
     .getElementById("plansSection")
     .scrollIntoView({ behavior: "smooth" });
-}
-
-function showUpgradePlans() {
-  const modal = document.getElementById("planModal");
-  const modalPlans = document.getElementById("modalPlans");
-
-  modalPlans.innerHTML = "";
-  availablePlans
-    .filter(
-      (plan) =>
-        !(
-          currentSubscription?.plan_id === plan.id &&
-          currentSubscription?.status === "ACTIVE"
-        )
-    )
-    .forEach((plan) => {
-      const planDiv = document.createElement("div");
-      planDiv.className = "plan-card";
-      planDiv.innerHTML = `
-                <div class="plan-name">${plan.name}</div>
-                <div class="plan-price">₹${plan.price}/${plan.duration}</div>
-                <ul class="plan-features">
-                    ${plan.features
-                      .map((feature) => `<li>${feature}</li>`)
-                      .join("")}
-                </ul>
-                <button class="btn btn-primary" onclick="upgradeToPlan('${
-                  plan.id
-                }')">Select Plan</button>`;
-      modalPlans.appendChild(planDiv);
-    });
-
-  modal.classList.remove("hidden");
-}
-
-function closeModal() {
-  document.getElementById("planModal").classList.add("hidden");
-}
-
-function checkAdminAccess() {
-  if (currentUser?.username === "admin") {
-    const headerContent = document.querySelector(".header-content");
-    const userMenu = headerContent.querySelector(".user-menu");
-
-    const adminLink = document.createElement("a");
-    adminLink.href = "/admin";
-    adminLink.className = "btn btn-warning";
-    adminLink.textContent = "Admin Panel";
-    adminLink.style.marginRight = "10px";
-
-    userMenu.insertBefore(adminLink, userMenu.firstChild);
-  }
 }
 
 function logout() {
