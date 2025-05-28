@@ -1,8 +1,8 @@
-const API_BASE_URL = "http://localhost:7000/api";
+// const API_BASE_URL = "http://localhost:7000/api";
 
 class API {
   static async request(endpoint, options = {}) {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `/api${endpoint}`;
     const token = localStorage.getItem("token");
 
     const config = {
