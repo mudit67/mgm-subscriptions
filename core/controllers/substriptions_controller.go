@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"subservice/core/models"
-	"subservice/core/services"
 	"subservice/utils"
 
 	"github.com/gin-gonic/gin"
@@ -11,13 +10,13 @@ import (
 )
 
 type SubscriptionController struct {
-	subscriptionService *services.SubscriptionService
+	subscriptionManager *models.SubscriptionManager
 	validator           *validator.Validate
 }
 
-func NewSubscriptionController(subscriptionService *services.SubscriptionService) *SubscriptionController {
+func NewSubscriptionController(subscriptionManager *models.SubscriptionManager) *SubscriptionController {
 	return &SubscriptionController{
-		subscriptionService: subscriptionService,
+		subscriptionManager: subscriptionManager,
 		validator:           validator.New(),
 	}
 }
@@ -34,7 +33,7 @@ func (c *SubscriptionController) UpsertSubscription(ctx *gin.Context) {
 		return
 	}
 
-	subscription, err := c.subscriptionService.UpsertSubscription(ctx.Request.Context(), &req)
+	subscription, err := c.subscriptionManager.UpsertSubscription(ctx.Request.Context(), &req)
 	if err != nil {
 		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to process subscription", err)
 		return
@@ -50,7 +49,7 @@ func (c *SubscriptionController) GetSubscription(ctx *gin.Context) {
 		return
 	}
 
-	subscription, err := c.subscriptionService.GetSubscription(ctx.Request.Context(), userID)
+	subscription, err := c.subscriptionManager.GetSubscription(ctx.Request.Context(), userID)
 	if err != nil {
 		utils.NotFoundResponse(ctx, "Subscription not found")
 		return
@@ -66,7 +65,7 @@ func (c *SubscriptionController) CancelSubscription(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.subscriptionService.CancelSubscription(ctx.Request.Context(), userID); err != nil {
+	if err := c.subscriptionManager.CancelSubscription(ctx.Request.Context(), userID); err != nil {
 		utils.ErrorResponse(ctx, http.StatusBadRequest, "Failed to cancel subscription", err)
 		return
 	}

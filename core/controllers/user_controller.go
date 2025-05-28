@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"subservice/core/models"
-	"subservice/core/services"
 	"subservice/utils"
 
 	"github.com/gin-gonic/gin"
@@ -11,13 +10,13 @@ import (
 )
 
 type UserController struct {
-	userService *services.UserService
+	userManager *models.UserManager
 	validator   *validator.Validate
 }
 
-func NewUserController(userService *services.UserService) *UserController {
+func NewUserController(userManager *models.UserManager) *UserController {
 	return &UserController{
-		userService: userService,
+		userManager: userManager,
 		validator:   validator.New(),
 	}
 }
@@ -34,7 +33,7 @@ func (c *UserController) Register(ctx *gin.Context) {
 		return
 	}
 
-	user, err := c.userService.Register(ctx.Request.Context(), &req)
+	user, err := c.userManager.Register(ctx.Request.Context(), &req)
 	if err != nil {
 		utils.ErrorResponse(ctx, http.StatusBadRequest, "Registration failed", err)
 		return
@@ -55,7 +54,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	loginResponse, err := c.userService.Login(ctx.Request.Context(), &req)
+	loginResponse, err := c.userManager.Login(ctx.Request.Context(), &req)
 	if err != nil {
 		utils.ErrorResponse(ctx, http.StatusUnauthorized, "Login failed", err)
 		return

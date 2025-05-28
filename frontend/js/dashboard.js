@@ -234,7 +234,7 @@ async function executeAction(apiCall, successMessage) {
     const response = await apiCall();
     if (response.success) {
       alert(successMessage);
-      await loadUserSubscription();
+      await loadDashboard();
     }
   } catch (error) {
     alert("Error: " + error.message);

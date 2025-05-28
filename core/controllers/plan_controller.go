@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"subservice/core/models"
-	"subservice/core/services"
 	"subservice/utils"
 
 	"github.com/gin-gonic/gin"
@@ -12,13 +11,13 @@ import (
 )
 
 type PlanController struct {
-	planService *services.PlanService
+	planManager *models.PlanManager
 	validator   *validator.Validate
 }
 
-func NewPlanController(planService *services.PlanService) *PlanController {
+func NewPlanController(planManager *models.PlanManager) *PlanController {
 	return &PlanController{
-		planService: planService,
+		planManager: planManager,
 		validator:   validator.New(),
 	}
 }
@@ -35,7 +34,7 @@ func (c *PlanController) CreatePlan(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.planService.CreatePlan(ctx.Request.Context(), &plan); err != nil {
+	if err := c.planManager.Create(ctx.Request.Context(), &plan); err != nil {
 		utils.InternalErrorResponse(ctx, err)
 		return
 	}
@@ -44,7 +43,7 @@ func (c *PlanController) CreatePlan(ctx *gin.Context) {
 }
 
 func (c *PlanController) GetAllPlans(ctx *gin.Context) {
-	plans, err := c.planService.GetAllPlans(ctx.Request.Context())
+	plans, err := c.planManager.GetAll(ctx.Request.Context())
 	if err != nil {
 		utils.InternalErrorResponse(ctx, err)
 		return
@@ -71,7 +70,7 @@ func (c *PlanController) UpdatePlan(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.planService.UpdatePlan(ctx.Request.Context(), id, &plan); err != nil {
+	if err := c.planManager.Update(ctx.Request.Context(), id, &plan); err != nil {
 		utils.InternalErrorResponse(ctx, err)
 		return
 	}
@@ -86,7 +85,7 @@ func (c *PlanController) DeletePlan(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.planService.DeletePlan(ctx.Request.Context(), id); err != nil {
+	if err := c.planManager.Delete(ctx.Request.Context(), id); err != nil {
 		utils.InternalErrorResponse(ctx, err)
 		return
 	}
