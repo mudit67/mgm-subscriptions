@@ -37,6 +37,13 @@ class API {
     });
   }
 
+  static async updatePlan(planId, planData) {
+    return this.request(`/plans/${planId}`, {
+      method: "PUT",
+      body: JSON.stringify(planData),
+    });
+  }
+
   static async deletePlan(planId) {
     return this.request(`/plans/${planId}`, {
       method: "DELETE",

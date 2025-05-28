@@ -323,172 +323,197 @@ body {
   }
 }
 
-
 /* Admin Dashboard Styles */
 .admin-section {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 }
 
 .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .section-header h2 {
-    margin: 0;
-    color: #333;
+  margin: 0;
+  color: #333;
 }
 
 /* Plans Table */
 .plans-table {
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
 }
 
 .table-header {
-    background: #f8f9fa;
+  background: #f8f9fa;
 }
 
 .table-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 2fr 1fr;
-    gap: 20px;
-    padding: 15px 20px;
-    border-bottom: 1px solid #e9ecef;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .table-row:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .table-cell {
-    display: flex;
-    align-items: center;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
 }
 
 .table-header .table-cell {
-    font-weight: 600;
-    color: #495057;
+  font-weight: 600;
+  color: #495057;
 }
 
 .plan-features-list {
-    font-size: 0.9rem;
-    color: #666;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .plan-actions {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .btn-small {
-    padding: 5px 15px;
-    font-size: 0.8rem;
+  padding: 5px 15px;
+  font-size: 0.8rem;
 }
 
 /* Statistics */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 .stat-card {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 10px;
-    text-align: center;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-    border-color: #667eea;
-    transform: translateY(-2px);
+  border-color: #667eea;
+  transform: translateY(-2px);
 }
 
 .stat-card h3 {
-    font-size: 2rem;
-    color: #667eea;
-    margin: 0 0 10px 0;
+  font-size: 2rem;
+  color: #667eea;
+  margin: 0 0 10px 0;
 }
 
 .stat-card p {
-    margin: 0;
-    color: #666;
-    font-weight: 500;
+  margin: 0;
+  color: #666;
+  font-weight: 500;
 }
 
 /* Form Styles */
 .form-group {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #333;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
+  outline: none;
+  border-color: #667eea;
 }
 
 .form-group textarea {
-    resize: vertical;
-    min-height: 100px;
+  resize: vertical;
+  min-height: 100px;
 }
 
 .modal-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    margin-top: 30px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .table-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .table-cell {
-        justify-content: space-between;
-    }
-    
-    .table-cell::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .table-cell {
+    justify-content: space-between;
+  }
+
+  .table-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+}
+
+/* Update the plan actions styling */
+.plan-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  min-width: 60px;
+}
+
+/* Ensure buttons don't break on smaller screens */
+@media (max-width: 768px) {
+  .plan-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .btn-small {
+    flex: 1;
+    min-width: 80px;
+  }
 }
